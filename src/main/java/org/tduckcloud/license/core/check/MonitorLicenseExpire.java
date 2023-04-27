@@ -10,8 +10,8 @@ import org.tduckcloud.license.core.entity.LicenseEntity;
  **/
 public class MonitorLicenseExpire {
 
-    private final LicenseCheckStrategy licenseCheckStrategy;
-    private final RuntimeExpireStrategy runtimeExpireStrategy;
+    public final LicenseCheckStrategy licenseCheckStrategy;
+    public final RuntimeExpireStrategy runtimeExpireStrategy;
 
     // 一分钟执行一次
     private long period = 1000 * 60;

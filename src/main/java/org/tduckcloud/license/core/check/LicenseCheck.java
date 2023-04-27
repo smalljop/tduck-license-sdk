@@ -1,11 +1,3 @@
-/*
- * Copyright (c) 2020-2020, org.smartboot. All rights reserved.
- * project name: smart-license
- * file name: License.java
- * Date: 2020-03-22
- * Author: sandao (zhengjunweimail@163.com)
- */
-
 package org.tduckcloud.license.core.check;
 
 import org.tduckcloud.license.core.LicenseException;
@@ -17,15 +9,13 @@ import java.io.*;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
  * 读取License并解析其内容
  *
- * @author 三刀
- * @version V1.0 , 2020/3/20
+ * @author tduck
  */
 public class LicenseCheck {
 
@@ -38,9 +28,11 @@ public class LicenseCheck {
     /**
      * 异常
      */
-    public static final RuntimeExpireStrategy defaultExpireStrategy = entity -> {
+    public static final RuntimeExpireStrategy defaultRuntimeExpireStrategy = entity -> {
         throw new LicenseException("license is expired");
     };
+
+    private static LicenseEntity licenseEntity;
 
     private static final String KEY_ALGORITHM = "RSA";
     private final byte[] readBuffer = new byte[8];
@@ -48,7 +40,7 @@ public class LicenseCheck {
     private MonitorLicenseExpire monitorLicenseExpire;
 
     public LicenseCheck() {
-        this(defaultLicenseCheckStrategy, defaultExpireStrategy, TimeUnit.HOURS.toMillis(1), true);
+        this(defaultLicenseCheckStrategy, defaultRuntimeExpireStrategy, TimeUnit.HOURS.toMillis(1), true);
     }
 
     public LicenseCheck(LicenseCheckStrategy checkStrategy,
@@ -92,7 +84,7 @@ public class LicenseCheck {
      * @return true:有效，false:无效
      */
     public Boolean checkLicense() {
-        return false;
+        return this.monitorLicenseExpire.licenseCheckStrategy.check(licenseEntity);
     }
 
 
@@ -158,7 +150,6 @@ public class LicenseCheck {
         }
         // q：解密为什么报错
         // a: 因为在加密的时候，是先将数据分段加密，然后将每段加密后的数据长度和数据一起写入到流中，所以在解密的时候，需要先读取每段数据的长度，然后再读取数据
-        System.out.println("data" + Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray()));
 //        byte[] data = decryptByPublicKey(decodeData, publicKey);
         byte[] data = byteArrayOutputStream.toByteArray();
         if (!Objects.equals(Md5.md5(byteArrayOutputStream.toByteArray()), new String(md5))) {
@@ -169,6 +160,7 @@ public class LicenseCheck {
         entity.setContact(new String(contact));
         entity.setData(data);
         monitorLicenseExpire.startMonitor(entity);
+        licenseEntity = entity;
         return entity;
     }
 

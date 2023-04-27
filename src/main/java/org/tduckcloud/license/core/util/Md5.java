@@ -1,11 +1,3 @@
-/*
- * Copyright (c) 2020-2020, org.smartboot. All rights reserved.
- * project name: smart-license
- * file name: Md5.java
- * Date: 2020-03-26
- * Author: sandao (zhengjunweimail@163.com)
- */
-
 package org.tduckcloud.license.core.util;
 
 import java.security.MessageDigest;
